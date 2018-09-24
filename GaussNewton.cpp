@@ -90,9 +90,9 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 {
 	int maxIteration = 1000; //1000
 	double oldError = 100;
-	double precision = 1e-5;
+	double precision = 1e-8;
 	std::vector<double> b2 = b;
-	double gamma = .1;
+	double gamma = .01;
 	for (int i = 0; i < maxIteration; i++)
 	{
 		std::vector<std::vector<double>> res = calculateResiduals(x, y, b2);
@@ -124,10 +124,10 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 	std::vector<double> b(numberOfParameters);
 	for (unsigned int i = 0; i < b.size(); i++)
 	{
-		b[i] = 1;
+		b[i] = 10;
 		//std::cout << "b[" << i << "]=" << b[i] << std::endl;
 	}
-
+	
 	return optimise(x, y, b);
 }
 
