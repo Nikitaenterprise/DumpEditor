@@ -21,20 +21,10 @@ void alg::algorithms::findThickness(int atomType)
 		double step = (biggestZ - smallestZ) / precision;
 		std::cout << smallestZ << " " << biggestZ << " " << step << std::endl;
 		
-		std::vector<std::vector<double>> x(precision, std::vector<double>(2)), _x(precision, std::vector<double>(2));
-		std::vector<double> y(precision), _y(precision);
-
-		/*for (const auto it : vec)
-		{
-			std::cout << it.at(0) << " ";
-			std::cout << it.at(1) << " ";
-			std::cout << it.at(2) << std::endl;
-		}
-*/
-		std::cout << "number of atoms " << vec.size() << std::endl;
+		std::vector<std::vector<double>> x(precision, std::vector<double>(2));
+		std::vector<double> y(precision);
 
 		std::ofstream out("out" + std::to_string(outputCounter) + ".txt");
-		std::ofstream out1("out" + std::to_string(1) + ".txt");
 		for (int i = 0; i < precision; i++)
 		{
 			int counter = 0;
@@ -44,23 +34,12 @@ void alg::algorithms::findThickness(int atomType)
 			}
 			x[i][0] = smallestZ + i * step;
 			y[i] = counter;
-			std::cout << x[i][0] << "	" << x[i][1] << "	" << y[i] << std::endl;
 			out << x[i][0] << "	" << x[i][1] << "	" << y[i] << std::endl;
 		}
 		GaussNewton GN;
 		std::vector<double> b = GN.optimise(x, y, 3);
-		std::cout << "we are here\n";
 		std::cout << b[0] << " " << b[1] << " " << b[2] << std::endl;
-		for (int j = 0; j < precision; j++)
-		{
-			_x[j][0] = j;
-			_y[j] = 2 * exp(-pow((_x[j][0] - 10), 2) / (2 * pow(1.3, 2)));
-			out1 << _x[j][0] << "	" << _x[j][1] << "	" << _y[j] << std::endl;
-		}
-
-		GaussNewton GN1;
-		std::vector<double> b1 = GN1.optimise(_x, _y, 3);
-		std::cout << b1[0] << " " << b1[1] << " " << b1[2] << std::endl;
+		
 		(*dump).~dump();
 		outputCounter++;
 	}

@@ -6,14 +6,6 @@ matrix::matrix(std::vector<std::vector<double>> dat)
 	this->data = dat;
 	this->nrows = dat.size();
 	this->ncols = dat[0].size();
-	//for (int i=0;i<nrows;i++)
-	//{
-	//	for (int j = 0; j < ncols; j++)
-	//		std::cout << data[i][j] << "	";
-	//	std::cout << std::endl;
-	//}
-
-	//std::cout << "constructor " << data.size() << " " << data[0].size() << std::endl;
 }
 
 matrix::matrix(int nrow, int ncol)
@@ -22,7 +14,6 @@ matrix::matrix(int nrow, int ncol)
 	this->ncols = ncol;
 	this->data.resize(nrows);
 	for (int i = 0; i < nrows; i++) this->data[i].resize(ncols);
-	//std::cout << "matrix " << nrows << " " << ncols << " " << data.size() << " " << data[0].size() <<std::endl;
 }
 
 int matrix::getNrows()
@@ -57,8 +48,6 @@ void matrix::setValues(std::vector<std::vector<double>> values)
 
 void matrix::setValueAt(int row, int col, double value)
 {
-	//std::cout << "setValueAt " << data.size() << " " << data[0].size() << std::endl;
-	//std::cout << nrows << " " << ncols << std::endl;
 	this->data[row][col] = value;
 }
 
@@ -85,9 +74,7 @@ matrix matrix::multiplyByConstant(double constant)
 	for (int i = 0; i < nrows; i++)
 	{
 		for (int j = 0; j < ncols; j++)
-		{
 			mat.setValueAt(i, j, data[i][j] * constant);
-		}
 	}
 	return mat;
 }
@@ -136,9 +123,7 @@ int matrixMath::changeSign(int i)
 
 matrix matrixMath::transpose(matrix _matrix)
 {
-	//std::cout << "transpose "<<_matrix.getNrows() << "	" << _matrix.getNcols() << std::endl;
 	matrix transposedmatrix(_matrix.getNcols(), _matrix.getNrows());
-	//std::cout << transposedmatrix.getNrows() << " " << transposedmatrix.getNcols() << std::endl;
 	for (int i = 0; i < _matrix.getNrows(); i++)
 	{
 		for (int j = 0; j < _matrix.getNcols(); j++)

@@ -12,10 +12,8 @@ std::vector<std::vector<double>> GaussNewton::calculateResiduals(std::vector<std
 {
 	std::vector<std::vector<double>> res(y.size(), std::vector<double>(2));
 
-	for (unsigned int i = 0; i < res.size(); i++) {
+	for (unsigned int i = 0; i < res.size(); i++)
 		res[i][0] = findY(x[i][0], b) - y[i];
-		//std::cout << "findY = " << findY(x[i][0], b) << " x[" << i << "][0] = " << x[i][0] << " y[" << i << "] = " << y[i] << std::endl;
-	}
 
 	return res;
 }
@@ -23,7 +21,6 @@ std::vector<std::vector<double>> GaussNewton::calculateResiduals(std::vector<std
 double GaussNewton::findY(double &x, std::vector<double> &b)
 {
 	// y = a*exp(-(x-b)^2/(2c^2))
-	//std::cout << "b[0] = " << b[0] << " b[1] = " << b[1] << " b[2] = " << b[2] << std::endl;
 	return b[0] * exp(-pow((x - b[1]), 2) / (2 * pow(b[2], 2)));
 }
 
@@ -88,7 +85,7 @@ std::vector<std::vector<double>> GaussNewton::transjacob(std::vector<std::vector
 
 std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, std::vector<double> &y, std::vector<double> &b)
 {
-	int maxIteration = 1000; //1000
+	int maxIteration = 5000;
 	double oldError = 100;
 	double precision = 1e-8;
 	std::vector<double> b2 = b;
@@ -97,10 +94,10 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 	{
 		std::vector<std::vector<double>> res = calculateResiduals(x, y, b2);
 		double error = calculateError(res);
-		//std::cout << "Error = " << error << " oldError = " << oldError << std::endl;
-		std::cout << "Iteration : " << i << ", Error-diff: " << abs(oldError - error) << ", b = ";
+		
+		/*std::cout << "Iteration : " << i << ", Error-diff: " << abs(oldError - error) << ", b = ";
 		for (unsigned int k = 0; k < b2.size(); k++) { std::cout << std::to_string(b2[k]) << " "; }
-		std::cout << "\n";
+		std::cout << "\n";*/
 
 		if (abs(oldError - error) <= precision)
 			break;
@@ -109,10 +106,7 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 		std::vector<std::vector<double>> jacobs = jacob(b2, x, y.size());
 		std::vector<std::vector<double>> values = transjacob(jacobs, res);
 		for (unsigned int j = 0; j < values.size(); j++)
-		{
 			b2[j] -= gamma * values[j][0];
-			//std::cout << b2[j] << " " << values[j][0] << std::endl;
-		}
 
 	}
 	return b2;
@@ -122,11 +116,9 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, std::vector<double> &y, int numberOfParameters)
 {
 	std::vector<double> b(numberOfParameters);
+
 	for (unsigned int i = 0; i < b.size(); i++)
-	{
 		b[i] = 10;
-		//std::cout << "b[" << i << "]=" << b[i] << std::endl;
-	}
 	
 	return optimise(x, y, b);
 }
@@ -134,10 +126,9 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 double GaussNewton::calculateError(std::vector<std::vector<double>> &res)
 {
 	double sum = 0;
-	for (unsigned int i = 0; i < res.size(); i++) {
+
+	for (unsigned int i = 0; i < res.size(); i++)
 		sum += pow(res[i][0],2);
-		//std::cout << "sum = " << sum << " res[" << i << "][0] = " << res[i][0] << std::endl;
-	}
 
 	return sqrt(sum);
 }
