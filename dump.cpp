@@ -1,30 +1,29 @@
 #include "dump.h"
 
+dump::Snapshot::Snapshot()
+{
+}
+
+dump::Snapshot::~Snapshot()
+{
+}
+
 std::vector<std::vector<double>> dump::Snapshot::getAtomCoordsWithType(int type)
 {
 	std::vector<std::vector<double>> newAtomCoords;
 	int i = 0;
-	for (auto it = atomCoords.begin(); it != atomCoords.end(); it++, i++)
+	for (auto it = atomCoordinates.begin(); it != atomCoordinates.end(); it++, i++)
 	{
 		if (getTypeOfAtomById(iD.at(i)) == type)
-		{
 			newAtomCoords.push_back((*it));
-		}
 	}
 	return newAtomCoords;
 }
 
 std::vector<double> dump::Snapshot::getAtomCoordsById(int id)
 {
-	std::vector<double> newAtomCoords;
-	int place;
-	int i = 0;
-	for (auto it = iD.begin(); it != iD.end(); it++, i++)
-	{
-		if ((*it) == id) place = i;
-	}
-	newAtomCoords = atomCoords.at(place);
-	return newAtomCoords;
+	for (unsigned int i = 0; i < iD.size(); i++)
+		if(iD[i]==id) return atomCoordinates.at(i);
 }
 
 void dump::Snapshot::showCoords(const std::vector<std::vector<double>> vec)
@@ -39,14 +38,21 @@ void dump::Snapshot::showCoords(const std::vector<std::vector<double>> vec)
 
 int dump::Snapshot::getTypeOfAtomById(int id)
 {
-	int place;
-	int i = 0;
-	
-	for (auto it = iD.begin(); it != iD.end(); it++, i++)
-	{
-		if ((*it) == id) place = i;
-	}
-	return type.at(place);
+	for (unsigned int i = 0; i < iD.size(); i++)
+		if (iD[i] == id) return type.at(i);
+}
+
+dump::dump(std::string _fileName) : fileName(_fileName)
+{
+	std::cout << "Searching file " << fileName << std::endl;
+	file.open(fileName);
+	if (!file.good()) 
+		std::cout << "NO " << fileName << " is founded!" << std::endl;
+}
+
+dump::~dump()
+{
+	std::cout << "dump deleted" << std::endl;
 }
 
 void dump::startScan()
@@ -58,22 +64,13 @@ void dump::startScan()
 	std::cout << "Number of snapshots is " << getNumberOfSnapshots() << std::endl;
 }
 
-dump::dump(std::string _fileName) : fileName(_fileName)
+int dump::findITEMInSnapshot(const std::string &_line, const std::string _token)
 {
-	std::cout << "Searching file " << fileName << std::endl;
-	file.open(fileName);
-	if (!file.good()) 
-		std::cout << "NO " << fileName << " is founded!" << std::endl;
+	return _line.find(_token);
 }
 
-
-dump::~dump()
+bool dump::readSnapshot() 
 {
-	std::cout << "dump deleted" << std::endl;
-}
-
-
-bool dump::readSnapshot() {
 
 	std::string line;
 	std::stringstream ss(line);
@@ -90,8 +87,6 @@ bool dump::readSnapshot() {
 	snapshots.push_back(Snapshot());
 	std::vector<Snapshot>::iterator it = snapshots.end() - 1;
 	
-	
-
 	// 18000000
 	std::getline(file, line);
 	ss << line;
@@ -129,38 +124,80 @@ bool dump::readSnapshot() {
 		token.clear();
 	}
 
-	// ITEM: ATOMS id type xs ys zs q
+	// There is some variants of dumps
+	// Each dump can have id`s, types, coordinates
+	// charges, velocities, forces, etc.
+	// For example :
+	// ITEM: ATOMS id type xs ys zs q ...
+	// Next lines searchin for this keywords
 	std::getline(file, line);
-	
-	it->atomCoords.resize(it->numberOfAtoms);
+	if (findITEMInSnapshot(line, std::string("id")) > 0) it->iD.resize(it->numberOfAtoms);
+	if (findITEMInSnapshot(line, std::string("type")) > 0) it->type.resize(it->numberOfAtoms);
+	if ((findITEMInSnapshot(line, std::string("q")) > 0) ||
+		(findITEMInSnapshot(line, std::string("Charge")) > 0)) it->charge.resize(it->numberOfAtoms);
+	if ((findITEMInSnapshot(line, std::string("x")) > 0) ||
+	    (findITEMInSnapshot(line, std::string("y")) > 0) ||
+	    (findITEMInSnapshot(line, std::string("z")) > 0)) it->atomCoordinates.resize(it->numberOfAtoms);
+	if ((findITEMInSnapshot(line, std::string("vx")) > 0) ||
+		(findITEMInSnapshot(line, std::string("vy")) > 0) ||
+		(findITEMInSnapshot(line, std::string("vz")) > 0)) it->atomVelocities.resize(it->numberOfAtoms);
+	if ((findITEMInSnapshot(line, std::string("fx")) > 0) ||
+		(findITEMInSnapshot(line, std::string("fy")) > 0) ||
+		(findITEMInSnapshot(line, std::string("fz")) > 0)) it->atomForces.resize(it->numberOfAtoms);
+
 	// 1 1 1.46458 1.4138 1.39455 0.00533662 
 	for (int i = 0; i < it->numberOfAtoms; i++) 
 	{
 		std::getline(file, line);
 		ss << line;
-		std::getline(ss, token, ' ');
-		it->iD.push_back(std::stoi(token));
-		std::getline(ss, token, ' ');
-		it->type.push_back(std::stoi(token));
-		std::getline(ss, token, ' ');
-		it->atomCoords[i].push_back(std::stod(token));
-		std::getline(ss, token, ' ');
-		it->atomCoords[i].push_back(std::stod(token));
-		std::getline(ss, token, ' ');
-		it->atomCoords[i].push_back(std::stod(token));
-		std::getline(ss, token, ' ');
-		it->charge.push_back(std::stod(token));
+
+		if (!it->iD.empty())
+		{
+			std::getline(ss, token, ' ');
+			it->iD[i]=(std::stoi(token));
+		}
+		if (!it->type.empty())
+		{
+			std::getline(ss, token, ' ');
+			it->type[i]=(std::stoi(token));
+		}
+		if (!it->atomCoordinates.empty())
+		{
+			std::getline(ss, token, ' ');
+			it->atomCoordinates[i].push_back(std::stod(token));
+			std::getline(ss, token, ' ');
+			it->atomCoordinates[i].push_back(std::stod(token));
+			std::getline(ss, token, ' ');
+			it->atomCoordinates[i].push_back(std::stod(token));
+		}
+		if (!it->charge.empty())
+		{
+			std::getline(ss, token, ' ');
+			it->charge[i]=(std::stod(token));
+		}
+		if (!it->atomVelocities.empty())
+		{
+			std::getline(ss, token, ' ');
+			it->atomVelocities[i].push_back(std::stod(token));
+			std::getline(ss, token, ' ');
+			it->atomVelocities[i].push_back(std::stod(token));
+			std::getline(ss, token, ' ');
+			it->atomVelocities[i].push_back(std::stod(token));
+		}
+		if (!it->atomForces.empty())
+		{
+			std::getline(ss, token, ' ');
+			it->atomForces[i].push_back(std::stod(token));
+			std::getline(ss, token, ' ');
+			it->atomForces[i].push_back(std::stod(token));
+			std::getline(ss, token, ' ');
+			it->atomForces[i].push_back(std::stod(token));
+		}
+		
 		ss.str(std::string());
 		ss.clear();
 		token.clear();
-	}
+	}	
 	return true;
 }
 
-dump::Snapshot::Snapshot()
-{
-}
-
-dump::Snapshot::~Snapshot()
-{
-}

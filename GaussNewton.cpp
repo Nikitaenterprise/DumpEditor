@@ -72,13 +72,6 @@ std::vector<std::vector<double>> GaussNewton::transjacob(std::vector<std::vector
 	matrix JTJ_1 = math.inverse(JTJ); // (JT * J)^-1
 	matrix JTJ_1JT = math.multiply(JTJ_1, JT); // (JT * J)^-1 * JT
 	matrix JTJ_1JTr = math.multiply(JTJ_1JT, r); // (JT * J)^-1 * JT * r
-	
-	/*forPrintingMatrix(r, std::string("r"));
-	forPrintingMatrix(J, std::string("J"));
-	forPrintingMatrix(JT, std::string("JT"));
-	forPrintingMatrix(JTJ_1, std::string("JTJ_1"));
-	forPrintingMatrix(JTJ_1JT, std::string("JTJ_1JT"));
-	forPrintingMatrix(JTJ_1JTr, std::string("JTJ_1JTr"));*/
 
 	return JTJ_1JTr.getValues();
 }
@@ -95,9 +88,9 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 		std::vector<std::vector<double>> res = calculateResiduals(x, y, b2);
 		double error = calculateError(res);
 		
-		/*std::cout << "Iteration : " << i << ", Error-diff: " << abs(oldError - error) << ", b = ";
+		std::cout << "Iteration : " << i << ", Error-diff: " << abs(oldError - error) << ", b = ";
 		for (unsigned int k = 0; k < b2.size(); k++) { std::cout << std::to_string(b2[k]) << " "; }
-		std::cout << "\n";*/
+		std::cout << "\n";
 
 		if (abs(oldError - error) <= precision)
 			break;
@@ -118,7 +111,7 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 	std::vector<double> b(numberOfParameters);
 
 	for (unsigned int i = 0; i < b.size(); i++)
-		b[i] = 10;
+		b[i] = 200;
 	
 	return optimise(x, y, b);
 }

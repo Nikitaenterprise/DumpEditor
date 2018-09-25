@@ -8,18 +8,16 @@ void alg::algorithms::findThickness(int atomType)
 	for (auto &dump : dumpSequence)
 	{
 		(*dump).startScan();
-		std::vector<std::vector<double>> vec = (*dump).snapshots.at(numberOfSnapshot).getAtomCoordsWithType(atomType);
-
+		auto vec = (*dump).snapshots.at(numberOfSnapshot).getAtomCoordsWithType(atomType);
+		
 		//Sorting with lambda
 		std::sort(vec.begin(), vec.end(), [](const std::vector<double>& a, const std::vector<double>& b) {
 			return a.at(2) < b.at(2);
 		});
 
-		double smallestZ = vec.at(0).at(2), biggestZ = vec.at(vec.size() - 1).at(2);
-		smallestZ = 0;
+		double smallestZ = 0, biggestZ = vec[vec.size() - 1][2];
 		int precision = 100;
 		double step = (biggestZ - smallestZ) / precision;
-		std::cout << smallestZ << " " << biggestZ << " " << step << std::endl;
 		
 		std::vector<std::vector<double>> x(precision, std::vector<double>(2));
 		std::vector<double> y(precision);
@@ -39,7 +37,8 @@ void alg::algorithms::findThickness(int atomType)
 		GaussNewton GN;
 		std::vector<double> b = GN.optimise(x, y, 3);
 		std::cout << b[0] << " " << b[1] << " " << b[2] << std::endl;
-		
+		double FWHM = 2 * sqrt(2 * log(2))*b[2];
+		std::cout << "FWHM = " << FWHM << std::endl;
 		(*dump).~dump();
 		outputCounter++;
 	}
