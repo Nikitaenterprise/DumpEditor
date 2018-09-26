@@ -5,6 +5,7 @@ void alg::algorithms::findThickness(int atomType)
 {
 	int numberOfSnapshot = 0;
 	int outputCounter = 0;
+	std::ofstream out("out.txt");
 	for (auto &dump : dumpSequence)
 	{
 		(*dump).startScan();
@@ -22,7 +23,7 @@ void alg::algorithms::findThickness(int atomType)
 		std::vector<std::vector<double>> x(precision, std::vector<double>(2));
 		std::vector<double> y(precision);
 
-		std::ofstream out("out" + std::to_string(outputCounter) + ".txt");
+		//std::ofstream out("out" + std::to_string(outputCounter) + ".txt");
 		for (int i = 0; i < precision; i++)
 		{
 			int counter = 0;
@@ -32,7 +33,7 @@ void alg::algorithms::findThickness(int atomType)
 			}
 			x[i][0] = smallestZ + i * step;
 			y[i] = counter;
-			out << x[i][0] << "	" << x[i][1] << "	" << y[i] << std::endl;
+			//out << x[i][0] << "	" << x[i][1] << "	" << y[i] << std::endl;
 		}
 		GaussNewton GN;
 		std::vector<double> b = GN.optimise(x, y, 3);
@@ -40,9 +41,10 @@ void alg::algorithms::findThickness(int atomType)
 		double FWHM = 2 * sqrt(2 * log(2))*b[2];
 		std::cout << "FWHM = " << FWHM << std::endl;
 		(*dump).~dump();
+		out << outputCounter << "	" << FWHM << std::endl;
 		outputCounter++;
 	}
-	
+	out.close();
 }
 
 

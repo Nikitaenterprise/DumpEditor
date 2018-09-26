@@ -44,7 +44,6 @@ int dump::Snapshot::getTypeOfAtomById(int id)
 
 dump::dump(std::string _fileName) : fileName(_fileName)
 {
-	std::cout << "Searching file " << fileName << std::endl;
 	file.open(fileName);
 	if (!file.good()) 
 		std::cout << "NO " << fileName << " is founded!" << std::endl;
@@ -52,16 +51,13 @@ dump::dump(std::string _fileName) : fileName(_fileName)
 
 dump::~dump()
 {
-	std::cout << "dump deleted" << std::endl;
 }
 
 void dump::startScan()
 {
 	std::cout << "Loaded file " << fileName << std::endl;
 	while (readSnapshot()) {}
-	std::cout << "Reading complete\n";
 	file.close();
-	std::cout << "Number of snapshots is " << getNumberOfSnapshots() << std::endl;
 }
 
 int dump::findITEMInSnapshot(const std::string &_line, const std::string _token)

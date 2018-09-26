@@ -72,9 +72,9 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 		std::vector<std::vector<double>> res = calculateResiduals(x, y, b2);
 		double error = calculateError(res);
 		
-		std::cout << "Iteration : " << i << ", Error-diff: " << abs(oldError - error) << ", b = ";
-		for (unsigned int k = 0; k < b2.size(); k++) { std::cout << std::to_string(b2[k]) << " "; }
-		std::cout << "\n";
+		//std::cout << "Iteration : " << i << ", Error-diff: " << abs(oldError - error) << ", b = ";
+		//for (unsigned int k = 0; k < b2.size(); k++) { std::cout << std::to_string(b2[k]) << " "; }
+		//std::cout << "\n";
 
 		if (abs(oldError - error) <= precision)
 			break;

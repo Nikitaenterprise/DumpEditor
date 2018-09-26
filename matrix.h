@@ -31,10 +31,7 @@ public:
 
 	T operator()(int row, int col) const;
 	template<class T> friend std::ostream& operator<<(std::ostream &os, const matrix<T> &a);
-
-	matrix<T> cofactor();
 };
-
 int changeSign(int i);
 template<class T> matrix<T> operator*(const matrix<T> &a, const matrix<T> &b);
 template<class T> matrix<T> operator*(const matrix<T> &a, T value);
@@ -43,6 +40,7 @@ template<class T> matrix<T> operator-(const matrix<T> &a, const matrix<T> &b);
 template<class T> matrix<T> createSubmatrix(const matrix<T> &a, int excluding_row, int excluding_col);
 template<class T> matrix<T> transpose(const matrix<T> &a);
 template<class T> T determinant(const matrix<T> &a);
+template<class T> matrix<T> cofactor(const matrix<T> &a);
 
 template<class T>
 matrix<T>::matrix(std::vector<std::vector<T>> dat)
@@ -167,7 +165,7 @@ void matrix<T>::transpose()
 template<class T>
 void matrix<T>::inverse()
 {
-	matrix<T> temp = this->cofactor();
+	matrix<T> temp = cofactor(*this);
 	temp.transpose();
 	*this = temp * (1.0 / determinant(*this));
 }
@@ -176,21 +174,6 @@ template<class T>
 inline T matrix<T>::operator()(int row, int col) const
 {
 	return this->data[row][col];
-}
-
-template<class T>
-matrix<T> matrix<T>::cofactor()
-{
-	matrix<T> mat(this->getNrows(), this->getNcols());
-	for (int i = 0; i < this->getNrows(); i++)
-	{
-		for (int j = 0; j < this->getNcols(); j++)
-		{
-			matrix<T> tempMatrix = createSubmatrix(*this, i, j);
-			mat.setValueAt(i, j, changeSign(i)*changeSign(j)*determinant(tempMatrix));
-		}
-	}
-	return mat;
 }
 
 template<class T>
@@ -282,4 +265,16 @@ inline T determinant(const matrix<T>& a)
 	for (int i = 0; i < a.getNcols(); i++)
 		sum += changeSign(i) * a(0, i) * determinant(createSubmatrix(a, 0, i));
 	return sum;
+}
+
+template<class T>
+inline matrix<T> cofactor(const matrix<T>& a)
+{
+	matrix<T> mat(a.getNrows(), a.getNcols());
+	for (int i = 0; i < a.getNrows(); i++)
+	{
+		for (int j = 0; j < a.getNcols(); j++)
+			mat.setValueAt(i, j, changeSign(i)*changeSign(j)*determinant(createSubmatrix(a, i, j)));
+	}
+	return mat;
 }
