@@ -51,18 +51,12 @@ double GaussNewton::derivative(double &x, std::vector<double> &b, int bIndex)
 
 std::vector<std::vector<double>> GaussNewton::transjacob(std::vector<std::vector<double>> &JArray, std::vector<std::vector<double>> &res)
 {
-	matrix<double> r(res); // r
-	matrix<double> J(JArray); // J
+	matrix<double> r(res); 
+	matrix<double> J(JArray);
 	matrix<double> JT = transpose(J);
-	matrix<double> JTJ = JT * J;
-	//matrix JTJ = math.multiply(JT, J); // JT * J
-	JTJ.inverse();
-	//matrix JTJ_1 = math.inverse(JTJ); // (JT * J)^-1
-	matrix<double> JTJ_1JT = JTJ * JT;
-	//matrix JTJ_1JT = math.multiply(JTJ_1, JT); // (JT * J)^-1 * JT
-	matrix<double> JTJ_1JTr = JTJ_1JT * r;
-	//matrix JTJ_1JTr = math.multiply(JTJ_1JT, r); // (JT * J)^-1 * JT * r
-
+	matrix<double> JTJ = JT * J; // JT * J
+	JTJ.inverse(); // (JT * J)^-1
+	matrix<double> JTJ_1JTr = JTJ * JT * r;// (JT * J)^-1 * JT * r
 	return JTJ_1JTr.getValues();
 }
 

@@ -155,7 +155,6 @@
     <ClCompile Include="dump.cpp" />
     <ClCompile Include="DumpEditor.cpp" />
     <ClCompile Include="GaussNewton.cpp" />
-    <ClCompile Include="matrix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="algorithms.h" />
