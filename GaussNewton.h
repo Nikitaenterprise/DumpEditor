@@ -15,7 +15,6 @@ public:
 	double findY(double &x, std::vector<double> &b);
 	std::vector<std::vector<double>> jacob(std::vector<double> &b, std::vector<std::vector<double>> &x, int numberOfObservations);
 	double derivative(double &x, std::vector<double> &b, int bIndex);
-	void forPrintingMatrix(matrix & m, std::string name);
 	std::vector<std::vector<double>> transjacob(std::vector<std::vector<double>> &JArray, std::vector<std::vector<double>> &res);
 	std::vector<double> optimise(std::vector<std::vector<double>> &x, std::vector<double> &y, std::vector<double> &b);
 	std::vector<double> optimise(std::vector<std::vector<double>> &x, std::vector<double>  &y, int numberOfParameters);

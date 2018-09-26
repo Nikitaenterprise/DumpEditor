@@ -49,29 +49,19 @@ double GaussNewton::derivative(double &x, std::vector<double> &b, int bIndex)
 	return (y1 - y2) / (2 * alpha);
 }
 
-void GaussNewton::forPrintingMatrix(matrix &m, std::string name)
-{
-	std::cout << "\n#----------#";
-	std::cout << "Now looking at " + name + "\n";
-	for (int i = 0; i < m.getNrows(); i++)
-	{
-		for (int j = 0; j < m.getNcols(); j++)
-			std::cout << m.getValueAt(i, j) << "	";
-		std::cout << std::endl;
-	}
-	std::cout << "Ended up looking at " + name + "\n\n\n";
-}
-
 std::vector<std::vector<double>> GaussNewton::transjacob(std::vector<std::vector<double>> &JArray, std::vector<std::vector<double>> &res)
 {
-	matrix r(res); // r
-	matrix J(JArray); // J
-	matrixMath math;
-	matrix JT = math.transpose(J); // JT
-	matrix JTJ = math.multiply(JT, J); // JT * J
-	matrix JTJ_1 = math.inverse(JTJ); // (JT * J)^-1
-	matrix JTJ_1JT = math.multiply(JTJ_1, JT); // (JT * J)^-1 * JT
-	matrix JTJ_1JTr = math.multiply(JTJ_1JT, r); // (JT * J)^-1 * JT * r
+	matrix<double> r(res); // r
+	matrix<double> J(JArray); // J
+	matrix<double> JT = transpose(J);
+	matrix<double> JTJ = JT * J;
+	//matrix JTJ = math.multiply(JT, J); // JT * J
+	JTJ.inverse();
+	//matrix JTJ_1 = math.inverse(JTJ); // (JT * J)^-1
+	matrix<double> JTJ_1JT = JTJ * JT;
+	//matrix JTJ_1JT = math.multiply(JTJ_1, JT); // (JT * J)^-1 * JT
+	matrix<double> JTJ_1JTr = JTJ_1JT * r;
+	//matrix JTJ_1JTr = math.multiply(JTJ_1JT, r); // (JT * J)^-1 * JT * r
 
 	return JTJ_1JTr.getValues();
 }
