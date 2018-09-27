@@ -17,8 +17,8 @@ private:
 		int numberOfAtoms;
 		
 		std::vector<std::vector<double>> box;
-		std::vector<int> iD;
-		std::vector<int> type;
+		std::vector<unsigned int> iD;
+		std::vector<unsigned int> type;
 		std::vector<double> charge;
 		std::vector<std::vector<double>> atomCoordinates;
 		std::vector<std::vector<double>> atomForces;

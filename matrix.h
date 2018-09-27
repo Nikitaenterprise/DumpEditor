@@ -30,13 +30,20 @@ public:
 	void inverse();
 
 	T operator()(int row, int col) const;
+	matrix<T>& operator=(const matrix<T> &a);
+	matrix<T>& operator+=(const matrix<T> &a);
+	matrix<T>& operator-=(const matrix<T> &a);
+	matrix<T>& operator*=(const matrix<T> &a);
+	matrix<T>& operator*=(T value);
+	matrix<T>& operator/=(T value);
 	template<class T> friend std::ostream& operator<<(std::ostream &os, const matrix<T> &a);
 };
 int changeSign(int i);
-template<class T> matrix<T> operator*(const matrix<T> &a, const matrix<T> &b);
-template<class T> matrix<T> operator*(const matrix<T> &a, T value);
 template<class T> matrix<T> operator+(const matrix<T> &a, const matrix<T> &b);
 template<class T> matrix<T> operator-(const matrix<T> &a, const matrix<T> &b);
+template<class T> matrix<T> operator*(const matrix<T> &a, const matrix<T> &b);
+template<class T> matrix<T> operator*(const matrix<T> &a, T value);
+template<class T> matrix<T> operator/(const matrix<T>& a, T value);
 template<class T> matrix<T> createSubmatrix(const matrix<T> &a, int excluding_row, int excluding_col);
 template<class T> matrix<T> transpose(const matrix<T> &a);
 template<class T> T determinant(const matrix<T> &a);
@@ -150,16 +157,7 @@ void matrix<T>::transpose()
 		for (int j = 0; j < this->getNcols(); j++)
 			transposedMatrix.setValueAt(j, i, this->operator()(i, j));
 	}
-	this->data.clear();
-	this->data.resize(transposedMatrix.getNrows());
-	this->setNrows(transposedMatrix.getNrows());
-	this->setNcols(transposedMatrix.getNcols());
-	for (unsigned int i = 0; i < this->data.size(); i++)
-	{
-		this->data[i].resize(transposedMatrix.getNcols());
-		for (unsigned j = 0; j < this->data[i].size(); j++)
-			data[i][j] = transposedMatrix(i, j);
-	}
+	*this = transposedMatrix;
 }
 
 template<class T>
@@ -177,52 +175,125 @@ inline T matrix<T>::operator()(int row, int col) const
 }
 
 template<class T>
-inline matrix<T> operator*(const matrix<T>& a, const matrix<T>& b)
+inline matrix<T>& matrix<T>::operator=(const matrix<T> &a)
 {
-	matrix<T> multipliedmatrix(a.getNrows(), b.getNcols());
+	if (this == &a)
+		return *this;
+
+	if (this->getNrows() != a.getNrows() 
+		|| this->getNcols() != a.getNcols()) 
+	{
+		this->data.clear();
+		this->nrows = a.getNrows();
+		this->ncols = a.getNcols();
+		this->data.resize(this->nrows);
+		for (unsigned int i = 0; i < this->nrows; i++)
+			this->data[i].resize(this->ncols);
+	}
+
+	for (int i = 0; i < this->getNrows(); i++)
+		for (int j = 0; j < this->getNcols(); j++)
+			this->data[i][j] = a(i,j);
+
+	return *this;
+}
+
+template<class T>
+inline matrix<T>& matrix<T>::operator+=(const matrix<T>& a)
+{
+	for (int i = 0; i < this->getNrows(); i++)
+	{
+		for (int j = 0; j < this->getNcols(); j++)
+			this->data[i][j] += a(i,j);
+	}
+	return *this;
+}
+
+template<class T>
+inline matrix<T>& matrix<T>::operator-=(const matrix<T>& a)
+{
+	for (int i = 0; i < this->getNrows(); i++)
+	{
+		for (int j = 0; j < this->getNcols(); j++)
+			this->data[i][j] -= a(i, j);
+	}
+	return *this;
+}
+
+template<class T>
+inline matrix<T>& matrix<T>::operator*=(const matrix<T>& a)
+{
+	matrix<T> multipliedmatrix(this->getNrows(), a.getNcols());
 	for (int i = 0; i < multipliedmatrix.getNrows(); i++)
 	{
 		for (int j = 0; j < multipliedmatrix.getNcols(); j++)
 		{
 			double sum = 0.0;
 
-			for (int k = 0; k < a.getNcols(); k++)
-				sum += a(i, k) * b(k, j);
+			for (int k = 0; k < this->getNcols(); k++)
+				sum += this->operator()(i, k) * a(k, j);
 
 			multipliedmatrix.setValueAt(i, j, sum);
 		}
 	}
-	return multipliedmatrix;
+	return *this=multipliedmatrix;
 }
 
 template<class T>
-inline matrix<T> operator*(const matrix<T>& a, T value)
+inline matrix<T>& matrix<T>::operator*=(T value)
 {
-	matrix<T> multipliedMatrix(a.getNrows(), a.getNcols());
-	for (int i = 0; i < multipliedMatrix.getNrows(); i++)
+	for (int i = 0; i < this->getNrows(); i++)
 	{
-		for (int j = 0; j < multipliedMatrix.getNcols(); j++)
-			multipliedMatrix.setValueAt(i, j, a(i, j) * value);
+		for (int j = 0; j < this->getNcols(); j++)
+			this->data[i][j] *= value;
 	}
-	return multipliedMatrix;
+	return *this;
+}
+
+template<class T>
+inline matrix<T>& matrix<T>::operator/=(T value)
+{
+	for (int i = 0; i < this->getNrows(); i++)
+	{
+		for (int j = 0; j < this->getNcols(); j++)
+			this->data[i][j] /= value;
+	}
+	return *this;
 }
 
 template<class T>
 inline matrix<T> operator+(const matrix<T>& a, const matrix<T>& b)
 {
-	matrix sumMatrix(a.getNrows(), a.getNcols());
-	for (int i = 0; i < sumMatrix.getNrows(); i++)
-	{
-		for (int j = 0; j < sumMatrix.getNcols(); j++)
-			sumMatrix.setValueAt(i, j, a(i, j) + b(i, j));
-	}
-	return sumMatrix;
+	matrix<T> tempMatrix(a);
+	return tempMatrix += b;
 }
 
 template<class T>
 inline matrix<T> operator-(const matrix<T>& a, const matrix<T>& b)
 {
-	return (a + b*(-1));
+	matrix<T> tempMatrix(a);
+	return tempMatrix -= b;
+}
+
+template<class T>
+inline matrix<T> operator*(const matrix<T>& a, const matrix<T>& b)
+{
+	matrix<T> tempMatrix(a);
+	return tempMatrix *= b;
+}
+
+template<class T>
+inline matrix<T> operator*(const matrix<T>& a, T value)
+{
+	matrix<T> tempMatrix(a);
+	return tempMatrix *= value;
+}
+
+template<class T>
+inline matrix<T> operator/(const matrix<T>& a, T value)
+{
+	matrix<T> tempMatrix(a);
+	return tempMatrix /= value;
 }
 
 template<class T>
