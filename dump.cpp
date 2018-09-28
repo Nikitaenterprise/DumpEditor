@@ -14,39 +14,23 @@ std::vector<std::vector<double>> dump::Snapshot::getAtomCoordsWithType(int type)
 	int i = 0;
 	for (auto it = atomCoordinates.begin(); it != atomCoordinates.end(); it++, i++)
 	{
-		if (getTypeOfAtomById(iD.at(i)) == type)
-			newAtomCoords.push_back((*it));
+		if (getTypeOfAtomById(iD[i]) == type)
+			newAtomCoords.push_back(*it);
 	}
 	return newAtomCoords;
 }
 
-std::vector<double> dump::Snapshot::getAtomCoordsById(int id)
+unsigned int dump::Snapshot::getTypeOfAtomById(int id)
 {
-	for (unsigned int i = 0; i < iD.size(); i++)
-		if(iD[i]==id) return atomCoordinates.at(i);
-}
-
-void dump::Snapshot::showCoords(const std::vector<std::vector<double>> vec)
-{
-	for (auto it = vec.begin(); it != vec.end(); it++)
-	{
-		std::cout << (*it).at(0) << " ";
-		std::cout << (*it).at(1) << " ";
-		std::cout << (*it).at(2) << std::endl;
-	}
-}
-
-int dump::Snapshot::getTypeOfAtomById(int id)
-{
-	for (unsigned int i = 0; i < iD.size(); i++)
-		if (iD[i] == id) return type.at(i);
+	unsigned int i = 0;
+	for (auto it = iD.begin(); it!= iD.end(); it++, i++)
+		if (*it == id) return type[i];
+	return NULL;
 }
 
 dump::dump(std::string _fileName) : fileName(_fileName)
 {
-	file.open(fileName);
-	if (!file.good()) 
-		std::cout << "NO " << fileName << " is founded!" << std::endl;
+	
 }
 
 dump::~dump()
@@ -55,6 +39,9 @@ dump::~dump()
 
 void dump::startScan()
 {
+	file.open(fileName);
+	if (!file.good())
+		std::cout << "NO " << fileName << " is founded!" << std::endl;
 	std::cout << "Loaded file " << fileName << std::endl;
 	while (readSnapshot()) {}
 	file.close();
@@ -67,7 +54,6 @@ int dump::findITEMInSnapshot(const std::string &_line, const std::string _token)
 
 bool dump::readSnapshot() 
 {
-
 	std::string line;
 	std::stringstream ss(line);
 	std::string token;
@@ -79,6 +65,7 @@ bool dump::readSnapshot()
 	{
 		return false;
 	}
+	std::cout << "start reading\n";
 
 	snapshots.push_back(Snapshot());
 	std::vector<Snapshot>::iterator it = snapshots.end() - 1;
@@ -150,12 +137,12 @@ bool dump::readSnapshot()
 		if (!it->iD.empty())
 		{
 			std::getline(ss, token, ' ');
-			it->iD[i]=(std::stoi(token));
+			it->iD[i] = (std::stoi(token));
 		}
 		if (!it->type.empty())
 		{
 			std::getline(ss, token, ' ');
-			it->type[i]=(std::stoi(token));
+			it->type[i] = (std::stoi(token));
 		}
 		if (!it->atomCoordinates.empty())
 		{
@@ -169,7 +156,7 @@ bool dump::readSnapshot()
 		if (!it->charge.empty())
 		{
 			std::getline(ss, token, ' ');
-			it->charge[i]=(std::stod(token));
+			it->charge[i] = (std::stod(token));
 		}
 		if (!it->atomVelocities.empty())
 		{
@@ -194,6 +181,7 @@ bool dump::readSnapshot()
 		ss.clear();
 		token.clear();
 	}	
+	std::cout << "end reading\n";
 	return true;
 }
 

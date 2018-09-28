@@ -10,12 +10,12 @@ void alg::algorithms::findThickness(int atomType)
 	{
 		(*dump).startScan();
 		auto vec = (*dump).snapshots.at(numberOfSnapshot).getAtomCoordsWithType(atomType);
-		
+		std::cout << "start sorting\n";
 		//Sorting with lambda
 		std::sort(vec.begin(), vec.end(), [](const std::vector<double>& a, const std::vector<double>& b) {
 			return a.at(2) < b.at(2);
 		});
-
+		std::cout << "end sorting\n";
 		double smallestZ = 0, biggestZ = vec[vec.size() - 1][2];
 		int precision = 100;
 		double step = (biggestZ - smallestZ) / precision;

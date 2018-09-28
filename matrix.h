@@ -187,7 +187,7 @@ inline matrix<T>& matrix<T>::operator=(const matrix<T> &a)
 		this->nrows = a.getNrows();
 		this->ncols = a.getNcols();
 		this->data.resize(this->nrows);
-		for (unsigned int i = 0; i < this->nrows; i++)
+		for (int i = 0; i < this->nrows; i++)
 			this->data[i].resize(this->ncols);
 	}
 

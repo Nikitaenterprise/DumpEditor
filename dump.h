@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 
 class dump
@@ -24,13 +25,8 @@ private:
 		std::vector<std::vector<double>> atomForces;
 		std::vector<std::vector<double>> atomVelocities;
 
-
-		void showCoords(const std::vector<std::vector<double>>);
-
-		int getTypeOfAtomById(int);
+		unsigned int getTypeOfAtomById(int);
 		std::vector<std::vector<double>> getAtomCoordsWithType(int);
-		std::vector<double> getAtomCoordsById(int);
-
 
 		Snapshot();
 		~Snapshot();
