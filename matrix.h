@@ -13,6 +13,7 @@ private:
 
 public:
 	matrix(std::vector<std::vector<T>> dat);
+	matrix(std::vector<T> dat);
 	matrix(int nrow, int ncol);
 	~matrix();
 
@@ -55,6 +56,19 @@ matrix<T>::matrix(std::vector<std::vector<T>> dat)
 	this->data = dat;
 	this->nrows = dat.size();
 	this->ncols = dat[0].size();
+}
+
+template<class T>
+matrix<T>::matrix(std::vector<T> dat)
+{
+	this->nrows = dat.size();
+	this->ncols = 1;
+	this->data.resize(dat.size());
+	for (unsigned int i = 0; i < dat.size(); i++)
+	{
+		this->data[i].resize(1);
+		this->data[i][0] = dat[i];
+	}
 }
 
 template<class T>

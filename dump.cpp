@@ -65,7 +65,6 @@ bool dump::readSnapshot()
 	{
 		return false;
 	}
-	std::cout << "start reading\n";
 
 	snapshots.push_back(Snapshot());
 	std::vector<Snapshot>::iterator it = snapshots.end() - 1;
@@ -181,7 +180,6 @@ bool dump::readSnapshot()
 		ss.clear();
 		token.clear();
 	}	
-	std::cout << "end reading\n";
 	return true;
 }
 

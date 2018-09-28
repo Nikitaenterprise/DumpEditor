@@ -3,24 +3,24 @@
 
 void alg::algorithms::findThickness(int atomType)
 {
-	int numberOfSnapshot = 0;
+	int numberOfSnapshot = 1;
 	int outputCounter = 0;
 	std::ofstream out("out.txt");
 	for (auto &dump : dumpSequence)
 	{
 		(*dump).startScan();
 		auto vec = (*dump).snapshots.at(numberOfSnapshot).getAtomCoordsWithType(atomType);
-		std::cout << "start sorting\n";
+		
 		//Sorting with lambda
 		std::sort(vec.begin(), vec.end(), [](const std::vector<double>& a, const std::vector<double>& b) {
 			return a.at(2) < b.at(2);
 		});
-		std::cout << "end sorting\n";
+		
 		double smallestZ = 0, biggestZ = vec[vec.size() - 1][2];
 		int precision = 100;
 		double step = (biggestZ - smallestZ) / precision;
 		
-		std::vector<std::vector<double>> x(precision, std::vector<double>(2));
+		std::vector<double> x(precision);
 		std::vector<double> y(precision);
 
 		//std::ofstream out("out" + std::to_string(outputCounter) + ".txt");
@@ -31,7 +31,7 @@ void alg::algorithms::findThickness(int atomType)
 			{
 				if ((smallestZ + i * step) < it.at(2) && (smallestZ + step + i * step) > it.at(2)) counter++;
 			}
-			x[i][0] = smallestZ + i * step;
+			x[i] = smallestZ + i * step;
 			y[i] = counter;
 			//out << x[i][0] << "	" << x[i][1] << "	" << y[i] << std::endl;
 		}

@@ -8,12 +8,12 @@ GaussNewton::~GaussNewton()
 {
 }
 
-std::vector<std::vector<double>> GaussNewton::calculateResiduals(std::vector<std::vector<double>> &x, std::vector<double> &y, std::vector<double> &b)
+std::vector<double> GaussNewton::calculateResiduals(std::vector<double> &x, std::vector<double> &y, std::vector<double> &b)
 {
-	std::vector<std::vector<double>> res(y.size(), std::vector<double>(2));
+	std::vector<double> res(y.size());
 
 	for (unsigned int i = 0; i < res.size(); i++)
-		res[i][0] = findY(x[i][0], b) - y[i];
+		res[i] = findY(x[i], b) - y[i];
 
 	return res;
 }
@@ -24,7 +24,7 @@ double GaussNewton::findY(double &x, std::vector<double> &b)
 	return b[0] * exp(-pow((x - b[1]), 2) / (2 * pow(b[2], 2)));
 }
 
-std::vector<std::vector<double>> GaussNewton::jacob(std::vector<double> &b, std::vector<std::vector<double>> &x, int numberOfObservations)
+std::vector<std::vector<double>> GaussNewton::jacob(std::vector<double> &b, std::vector<double> &x, int numberOfObservations)
 {
 	int numberOfVariables = b.size();
 	std::vector<std::vector<double>> jc(numberOfObservations, std::vector<double>(numberOfVariables));
@@ -32,7 +32,7 @@ std::vector<std::vector<double>> GaussNewton::jacob(std::vector<double> &b, std:
 	for (int i = 0; i < numberOfObservations; i++)
 	{
 		for (int j = 0; j < numberOfVariables; j++)
-			jc[i][j] = derivative(x[i][0], b, j);
+			jc[i][j] = derivative(x[i], b, j);
 	}
 	return jc;
 }
@@ -49,7 +49,7 @@ double GaussNewton::derivative(double &x, std::vector<double> &b, int bIndex)
 	return (y1 - y2) / (2 * alpha);
 }
 
-std::vector<std::vector<double>> GaussNewton::transjacob(std::vector<std::vector<double>> &JArray, std::vector<std::vector<double>> &res)
+std::vector<std::vector<double>> GaussNewton::transjacob(std::vector<std::vector<double>> &JArray, std::vector<double> &res)
 {
 	matrix<double> r(res); 
 	matrix<double> J(JArray);
@@ -60,7 +60,7 @@ std::vector<std::vector<double>> GaussNewton::transjacob(std::vector<std::vector
 	return JTJ_1JTr.getValues();
 }
 
-std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, std::vector<double> &y, std::vector<double> &b)
+std::vector<double> GaussNewton::optimise(std::vector<double> &x, std::vector<double> &y, std::vector<double> &b)
 {
 	int maxIteration = 5000;
 	double oldError = 100;
@@ -69,7 +69,7 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 	double gamma = .01;
 	for (int i = 0; i < maxIteration; i++)
 	{
-		std::vector<std::vector<double>> res = calculateResiduals(x, y, b2);
+		std::vector<double> res = calculateResiduals(x, y, b2);
 		double error = calculateError(res);
 		
 		//std::cout << "Iteration : " << i << ", Error-diff: " << abs(oldError - error) << ", b = ";
@@ -90,7 +90,7 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 
 }
 
-std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, std::vector<double> &y, int numberOfParameters)
+std::vector<double> GaussNewton::optimise(std::vector<double> &x, std::vector<double> &y, int numberOfParameters)
 {
 	std::vector<double> b(numberOfParameters);
 
@@ -100,12 +100,12 @@ std::vector<double> GaussNewton::optimise(std::vector<std::vector<double>> &x, s
 	return optimise(x, y, b);
 }
 
-double GaussNewton::calculateError(std::vector<std::vector<double>> &res)
+double GaussNewton::calculateError(std::vector<double> &res)
 {
 	double sum = 0;
 
 	for (unsigned int i = 0; i < res.size(); i++)
-		sum += pow(res[i][0],2);
+		sum += pow(res[i],2);
 
 	return sqrt(sum);
 }
