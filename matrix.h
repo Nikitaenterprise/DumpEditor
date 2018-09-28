@@ -7,8 +7,8 @@ template <class T>
 class matrix
 {
 private:
-	int nrows = 0;
-	int ncols = 0;
+	size_t nrows = 0;
+	size_t ncols = 0;
 	std::vector<std::vector<T>> data;
 
 public:
@@ -89,7 +89,7 @@ matrix<T>::~matrix()
 template<class T>
 int matrix<T>::getNrows() const
 {
-	return this->nrows;
+	return int(this->nrows);
 }
 
 template<class T>
@@ -101,7 +101,7 @@ void matrix<T>::setNrows(int nrows)
 template<class T>
 int matrix<T>::getNcols() const
 {
-	return this->ncols;
+	return int(this->ncols);
 }
 
 template<class T>
@@ -138,7 +138,7 @@ template<class T>
 int matrix<T>::size() const
 {
 	if (isSquare())
-		return this->nrows;
+		return int(this->nrows);
 	return -1;
 }
 

@@ -26,7 +26,7 @@ double GaussNewton::findY(double &x, std::vector<double> &b)
 
 std::vector<std::vector<double>> GaussNewton::jacob(std::vector<double> &b, std::vector<double> &x, int numberOfObservations)
 {
-	int numberOfVariables = b.size();
+	int numberOfVariables = int(b.size());
 	std::vector<std::vector<double>> jc(numberOfObservations, std::vector<double>(numberOfVariables));
 
 	for (int i = 0; i < numberOfObservations; i++)
@@ -80,7 +80,7 @@ std::vector<double> GaussNewton::optimise(std::vector<double> &x, std::vector<do
 			break;
 
 		oldError = error;
-		std::vector<std::vector<double>> jacobs = jacob(b2, x, y.size());
+		std::vector<std::vector<double>> jacobs = jacob(b2, x, int(y.size()));
 		std::vector<std::vector<double>> values = transjacob(jacobs, res);
 		for (unsigned int j = 0; j < values.size(); j++)
 			b2[j] -= gamma * values[j][0];

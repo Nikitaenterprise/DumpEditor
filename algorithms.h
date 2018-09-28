@@ -13,7 +13,7 @@ namespace alg
 
 	public:
 
-		void findThickness(int);
+		void findThickness(int atomType, int numberOfSnapshot);
 
 		algorithms(const std::string, int, int, const std::string);
 		~algorithms();

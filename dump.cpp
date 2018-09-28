@@ -17,6 +17,10 @@ std::vector<std::vector<double>> dump::Snapshot::getAtomCoordsWithType(int type)
 		if (getTypeOfAtomById(iD[i]) == type)
 			newAtomCoords.push_back(*it);
 	}
+
+	if (newAtomCoords.empty())
+		throw new std::exception(std::string("You dont have id: " + std::to_string(type) + " in your dump").c_str());
+
 	return newAtomCoords;
 }
 
@@ -30,7 +34,16 @@ unsigned int dump::Snapshot::getTypeOfAtomById(int id)
 
 dump::dump(std::string _fileName) : fileName(_fileName)
 {
-	
+	file.open(fileName);
+	if (!file.good())
+		throw new std::exception(std::string("No " + fileName + " is founded!").c_str());
+	std::cout << "Loaded file " << fileName << std::endl;
+	std::string line;
+	std::getline(file, line);
+	if (line.compare("ITEM: TIMESTEP") != 0)
+		throw new std::exception(std::string("Wrong file format").c_str());
+	file.clear();
+	file.seekg(0, std::ios_base::beg);
 }
 
 dump::~dump()
@@ -39,17 +52,13 @@ dump::~dump()
 
 void dump::startScan()
 {
-	file.open(fileName);
-	if (!file.good())
-		std::cout << "NO " << fileName << " is founded!" << std::endl;
-	std::cout << "Loaded file " << fileName << std::endl;
 	while (readSnapshot()) {}
 	file.close();
 }
 
 int dump::findITEMInSnapshot(const std::string &_line, const std::string _token)
 {
-	return _line.find(_token);
+	return int(_line.find(_token));
 }
 
 bool dump::readSnapshot() 
@@ -61,10 +70,8 @@ bool dump::readSnapshot()
 	// ITEM: TIMESTEP
 	std::getline(file, line);
 
-	if (file.eof()) 
-	{
+	if (file.eof())
 		return false;
-	}
 
 	snapshots.push_back(Snapshot());
 	std::vector<Snapshot>::iterator it = snapshots.end() - 1;
