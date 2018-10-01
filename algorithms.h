@@ -13,8 +13,8 @@ namespace alg
 
 	public:
 
-		void findThickness(int atomType, int numberOfSnapshot);
-
+		void thickness(int atomType, int numberOfSnapshot);
+		double findFWHM(const std::vector<std::vector<double>> &vec);
 		algorithms(const std::string, int, int, const std::string);
 		~algorithms();
 	};
