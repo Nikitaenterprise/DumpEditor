@@ -15,8 +15,11 @@ private:
 	class Snapshot
 	{
 	public:
-		int timestep;
-		int numberOfAtoms;
+		Snapshot();
+		~Snapshot();
+
+		int timestep = 0;
+		int numberOfAtoms = 0;
 		
 		std::vector<std::vector<double>> box;
 		std::vector<unsigned int> iD;
@@ -27,17 +30,16 @@ private:
 		std::vector<std::vector<double>> atomVelocities;
 
 		unsigned int getTypeOfAtomById(int);
-		std::vector<std::vector<double>> getAtomCoordsWithType(int);
-
-		Snapshot();
-		~Snapshot();
+		std::vector<std::vector<double>> getAtomCoordsWithType(int);		
 	};
 	bool readSnapshot();
 
 	std::string fileName;
-	std::fstream file;
+	std::ifstream file;
 
 public:
+	dump(std::string);
+	~dump();
 	
 	std::string getFileName() { return fileName; };
 	int getNumberOfSnapshots() { return static_cast<int>(snapshots.size()); };
@@ -47,7 +49,5 @@ public:
 
 	std::vector<Snapshot> snapshots;
 
-	dump(std::string);
-	~dump();
 };
 

@@ -1,6 +1,6 @@
 #include "algorithms.h"
 
-void alg::algorithms::thickness(int atomType, int numberOfSnapshot)
+void alg::algorithms::thickness(int atomType, int numberOfSnapshot, bool singleFrame)
 {
 	int outputCounter = 0;
 	std::ofstream out("out.txt");
@@ -8,23 +8,40 @@ void alg::algorithms::thickness(int atomType, int numberOfSnapshot)
 	{
 		try
 		{
-			(*dump).startScan();
-			auto vec = (*dump).snapshots.at(numberOfSnapshot).getAtomCoordsWithType(atomType);
-
-			//Sorting with lambda
-			std::sort(vec.begin(), vec.end(), [](const std::vector<double>& a, const std::vector<double>& b) {
-				return a.at(2) < b.at(2);
-			});
-
-			double FWHM = findFWHM(vec);
-			out << outputCounter << "	" << FWHM << std::endl;
-			outputCounter++;
+			dump->startScan();
+			if (!singleFrame)
+			{
+				for (int i = 0; i < dump->getNumberOfSnapshots(); i++)
+				{
+					auto vec = dump->snapshots.at(i).getAtomCoordsWithType(atomType);
+					sortByZ(vec);
+					double FWHM = findFWHM(vec);
+					out << outputCounter << "	" << FWHM << std::endl;
+					outputCounter++;
+				}
+			}
+			else
+			{
+				auto vec = dump->snapshots.at(numberOfSnapshot).getAtomCoordsWithType(atomType);
+				sortByZ(vec);
+				double FWHM = findFWHM(vec);
+				out << outputCounter << "	" << FWHM << std::endl;
+				outputCounter++;
+			}
 		}
 		catch (const std::exception *ex) { std::cout << ex->what() << std::endl; }
 		catch (...) { std::cout << "Something went wrong\n"; }
 		(*dump).~dump();
 	}
 
+}
+
+void alg::algorithms::sortByZ(std::vector<std::vector<double>> &vec)
+{
+	//Sorting with lambda
+	std::sort(vec.begin(), vec.end(), [](const std::vector<double>& a, const std::vector<double>& b) {
+		return a.at(2) < b.at(2);
+	});
 }
 
 double alg::algorithms::findFWHM(const std::vector<std::vector<double>> &vec)
@@ -62,6 +79,12 @@ alg::algorithms::algorithms(const std::string _fileName, int startNumber, int en
 		dumpSequence.push_back(new dump(_fileName + std::to_string(i) + fileExtension));
 		dumpSequence.begin();
 	}
+}
+
+
+alg::algorithms::algorithms(const std::string &_fileName)
+{
+	dumpSequence.push_back(new dump(_fileName));
 }
 
 
